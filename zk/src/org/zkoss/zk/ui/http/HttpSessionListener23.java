@@ -12,6 +12,9 @@ Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 */
 package org.zkoss.zk.ui.http;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
@@ -22,6 +25,10 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.zkoss.lang.Classes;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.WebApp;
@@ -39,6 +46,7 @@ import org.zkoss.zk.ui.sys.Attributes;
  */
 public class HttpSessionListener23 implements javax.servlet.http.HttpSessionListener, HttpSessionAttributeListener,
 		ServletContextAttributeListener, ServletContextListener {
+	private static final Logger log = LoggerFactory.getLogger(HttpSessionListener23.class);
 	private WebManager _webman;
 	private boolean _webmanCreated;
 
@@ -120,6 +128,15 @@ public class HttpSessionListener23 implements javax.servlet.http.HttpSessionList
 			if (_webmanCreated)
 				_webman.destroy();
 			_webman = null;
+		}
+		if (Classes.existsByThread("org.zkoss.zkmax.au.websocket.WebSocketEndPoint")) {
+			try {
+				Class<?> webSocketEndPointClz = Class.forName("org.zkoss.zkmax.au.websocket.WebSocketEndPoint");
+				Method shutdownPingExecutorMethod = webSocketEndPointClz.getDeclaredMethod("shutdownPingExecutor");
+				shutdownPingExecutorMethod.invoke(null);
+			} catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+				log.warn("fail to shut down ping executor", e);
+			}
 		}
 	}
 
