@@ -7,8 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@v1.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commands: rebase
+          permission: write
           issue-type: pull-request
