@@ -11,5 +11,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commands: rebase
-          permission: write
           issue-type: pull-request
